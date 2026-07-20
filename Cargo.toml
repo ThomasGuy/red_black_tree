@@ -1,0 +1,12 @@
+[package]
+name = "binary_search_tree"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+pretty_assertions = "1.4.1"
+
+# bodium_core = { path = "../../lib_bodium/core" }
+plotters = "0.3.7"
+bodium_core = { version = "0.2.0", path = "/home/bo/sportny_26/rust/lib_bodium/core" }
+
