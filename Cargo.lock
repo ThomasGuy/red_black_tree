@@ -18,19 +18,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.104"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
+
+[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
-
-[[package]]
-name = "binary_search_tree"
-version = "0.1.0"
-dependencies = [
- "bodium_core",
- "plotters",
- "pretty_assertions",
-]
 
 [[package]]
 name = "bitflags"
@@ -657,6 +654,17 @@ name = "rand_core"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69"
+
+[[package]]
+name = "red_black_tree"
+version = "0.2.0"
+dependencies = [
+ "anyhow",
+ "bodium_core",
+ "plotters",
+ "pretty_assertions",
+ "rand",
+]
 
 [[package]]
 name = "redox_users"

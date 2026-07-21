@@ -1,12 +1,19 @@
-use crate::binary_tree::tree::Tree;
+use crate::red_black_tree::tree::Tree;
 use std::fmt::Display;
 
 pub type Link<K, V> = Option<Box<Node<K, V>>>;
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Colour {
+    Red,
+    Black,
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Node<K, V> {
     pub key: K,
     pub val: V,
+    pub colour: Colour,
     pub(crate) left: Tree<K, V>,
     pub(crate) right: Tree<K, V>,
     pub(crate) node_count: u32,
@@ -21,6 +28,7 @@ where
         Node {
             key,
             val,
+            colour: Colour::Red,
             left: Tree::new(),
             right: Tree::new(),
             node_count,

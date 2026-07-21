@@ -1,4 +1,4 @@
-use crate::binary_tree::{BinarySearchTree, Node};
+use crate::red_black_tree::{Colour, Node, RedBlackTree};
 use bodium_core::data_types::KvError;
 use plotters::prelude::*;
 
@@ -7,6 +7,7 @@ struct VisualNode {
     x: f64,
     y: f64,
     label: String,
+    colour: Colour,
 }
 
 /// Represents a line connection between a parent node and a child node
@@ -15,7 +16,7 @@ struct VisualLine {
     end: (f64, f64),
 }
 
-pub fn draw_tree_graph<K, V>(output_path: &str, bst: &BinarySearchTree<K, V>) -> Result<(), KvError>
+pub fn draw_tree_graph<K, V>(output_path: &str, rbt: &RedBlackTree<K, V>) -> Result<(), KvError>
 where
     K: Ord + Clone + std::fmt::Display,
     V: Clone + std::fmt::Display,
@@ -26,7 +27,7 @@ where
         .map_err(|e| KvError::Plot(format!("Failed to fill canvas: {:?}", e)))?;
 
     // 1. Fetch the in-order sorted list of nodes
-    let nodes_list = bst.nodes();
+    let nodes_list = rbt.nodes();
     let total_nodes = nodes_list.len();
 
     if nodes_list.is_empty() {
@@ -39,7 +40,7 @@ where
 
     // Run the layout calculation engine starting at depth 0 without a parent coordinate
     compute_layout(
-        bst.root_node(),
+        rbt.root_node(),
         &nodes_list,
         0.0,
         None,
@@ -76,12 +77,16 @@ where
 
     // 5. Draw the node circles and white text labels
     for node in &visual_nodes {
-        // Draw blue node circle
+        let circle_colour = if node.colour == Colour::Red {
+            &RED
+        } else {
+            &BLACK
+        };
         chart
             .draw_series(std::iter::once(Circle::new(
                 (node.x, node.y),
                 12,
-                BLUE.filled(),
+                circle_colour.filled(),
             )))
             .map_err(|e| KvError::Plot(format!("Failed to draw node circle: {:?}", e)))?;
 
@@ -112,7 +117,7 @@ where
 }
 
 // 🚀 True structural layout engine:
-// Recursively traverses the actual BST structure while using the global sorted list for X coordinates.
+// Recursively traverses the actual rbt structure while using the global sorted list for X coordinates.
 fn compute_layout<K: Ord + std::fmt::Display, V>(
     current_node: Option<&Node<K, V>>,
     global_list: &[&Node<K, V>],
@@ -144,6 +149,7 @@ fn compute_layout<K: Ord + std::fmt::Display, V>(
         x: global_x,
         y: depth,
         label: format!("{}", node.key),
+        colour: node.colour,
     });
 
     // 4. Add branch connection line back up to the parent node
