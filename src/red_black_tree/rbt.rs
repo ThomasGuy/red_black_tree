@@ -49,11 +49,6 @@ where
         self.root.min_ref()
     }
 
-    // pub fn delete(&mut self, key: K) {
-    //     // Pass as reference matching your optimized Tree signature
-    //     self.root.remove(&key);
-    // }
-
     pub fn is_empty(&self) -> bool {
         self.root.is_empty()
     }
@@ -88,6 +83,7 @@ where
         self.root.keys_ref(&mut queue);
         queue
     }
+
     /// 🚀 Lazily streams references directly from your tree nodes
     pub fn iter_keys(&self) -> std::vec::IntoIter<&K> {
         self.keys_ref().into_iter()
@@ -116,6 +112,12 @@ where
     // Returns Some(black_height) if perfectly balanced, or None if broken!
     pub fn verify_black_balance(&self) -> Option<u32> {
         self.root.check_black_height()
+    }
+
+    pub fn trace_search_path(&self, target: &K) -> Vec<&K> {
+        let mut queue: Vec<&K> = Vec::new();
+        self.root.trace_search_path(target, &mut queue);
+        queue
     }
 }
 

@@ -4,7 +4,7 @@ use std::{env, process};
 
 pub mod config;
 pub mod red_black_tree;
-pub mod visualize;
+pub mod visualize_rbt;
 
 use crate::config::{Config, DataFormat};
 use crate::red_black_tree::rbt::RedBlackTree;
@@ -48,7 +48,7 @@ pub fn run_pipeline(config: Config) -> anyhow::Result<()> {
                 println!("ID: {:<5} -> Coordinates: {}", key, value);
             }
 
-            visualize::draw_tree_graph("tree_view.png", &rbt)?;
+            visualize_rbt::draw_tree("tree_view.png", &rbt, None)?;
         }
 
         // --- BRANCH B: GEOMETRIC FORMAT PROCESSING TRACK ---
@@ -74,7 +74,7 @@ pub fn run_pipeline(config: Config) -> anyhow::Result<()> {
                 rbt.size()
             );
 
-            visualize::draw_tree_graph("tree_view.png", &rbt)?;
+            visualize_rbt::draw_tree("tree_view.png", &rbt, None)?;
         }
     }
 
@@ -109,7 +109,7 @@ fn stress_test_red_black_tree() {
             println!("{:?}", shuffled_dataset);
 
             // 4. Save the broken state layout snapshot
-            if let Err(e) = visualize::draw_tree_graph("broken_tree_view.png", &rbt) {
+            if let Err(e) = visualize_rbt::draw_tree("broken_tree_view.png", &rbt, None) {
                 println!("Failed to output visual graph: {:?}", e);
             } else {
                 println!("📸 Saved structural snapshot to 'broken_tree_view.png'");

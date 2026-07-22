@@ -40,9 +40,9 @@ where
         self.insert_recursive(key, val);
 
         // 🚀 Rule: The root of a Red-Black Tree must ALWAYS be Black
-        if let Some(ref mut root_node) = self.0 {
-            root_node.colour = Colour::Black;
-        }
+        // if let Some(ref mut root_node) = self.0 {
+        //     root_node.colour = Colour::Black;
+        // }
     }
 
     fn insert_recursive(&mut self, key: K, val: V) {
@@ -255,60 +255,6 @@ where
         None
     }
 
-    // 🚀 True Hibbard Helper: Detaches the absolute minimum node from the tree and returns it!
-    // fn remove_min(&mut self) -> Link<K, V> {
-    //     if let Some(mut node) = self.0.take() {
-    //         if node.left.0.is_none() {
-    //             // No left child! This node is the minimum. Return its right child to repair parent link
-    //             self.0 = node.right.0.take();
-    //             node.node_count = 1;
-    //             Some(node)
-    //         } else {
-    //             // Drill down left branch
-    //             let min_node = node.left.remove_min();
-    //             node.node_count = node.right.size() + node.left.size() + 1;
-    //             self.0 = Some(node);
-    //             min_node
-    //         }
-    //     } else {
-    //         None
-    //     }
-    // }
-
-    // 🚀 Pristine Hibbard Deletion Engine
-    // pub(crate) fn remove(&mut self, key: &K) {
-    //     if let Some(mut node) = self.0.take() {
-    //         match key.cmp(&node.key) {
-    //             Ordering::Less => {
-    //                 node.left.remove(key);
-    //                 node.node_count = node.right.size() + node.left.size() + 1;
-    //                 self.0 = Some(node);
-    //             }
-    //             Ordering::Greater => {
-    //                 node.right.remove(key);
-    //                 node.node_count = node.right.size() + node.left.size() + 1;
-    //                 self.0 = Some(node);
-    //             }
-    //             Ordering::Equal => {
-    //                 match (node.left.0.is_none(), node.right.0.is_none()) {
-    //                     (true, true) => self.0 = None,
-    //                     (true, false) => self.0 = node.right.0.take(),
-    //                     (false, true) => self.0 = node.left.0.take(),
-    //                     (false, false) => {
-    //                         // Two children! Find successor (min of right branch)
-    //                         let mut successor = node.right.remove_min().unwrap();
-    //                         successor.left = Tree(node.left.0.take());
-    //                         successor.right = Tree(node.right.0.take());
-    //                         successor.node_count =
-    //                             successor.right.size() + successor.left.size() + 1;
-    //                         self.0 = Some(successor);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
     pub(crate) fn size(&self) -> u32 {
         if let Some(node) = &self.0 {
             return node.node_count;
@@ -393,6 +339,21 @@ where
                 Ordering::Equal => node.left.size(),
                 Ordering::Greater => node.left.size() + node.right.rank(key) + 1,
             },
+        }
+    }
+
+    pub(crate) fn trace_search_path<'a>(&'a self, target: &K, queue: &mut Vec<&'a K>) {
+        // 1. Base case: If we hit a None leaf, stop tracking
+        let Some(node) = &self.0 else {
+            return;
+        };
+        // 2. Record that we visited this node along the search path
+        queue.push(&node.key);
+        // 3. Recurse down the appropriate branch based on binary search rules
+        match target.cmp(&node.key) {
+            Ordering::Less => node.left.trace_search_path(target, queue),
+            Ordering::Greater => node.right.trace_search_path(target, queue),
+            Ordering::Equal => {} // Target found! Stop recursing and return up the stack
         }
     }
 }

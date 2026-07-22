@@ -1,6 +1,8 @@
+use std::collections::HashSet;
+
 use crate::red_black_tree::{Colour, Node, RedBlackTree};
 use bodium_core::data_types::KvError;
-use plotters::prelude::*;
+use plotters::{prelude::*, style::full_palette::GREEN_200};
 
 /// Represents a node's calculated coordinates and its label for drawing
 struct VisualNode {
@@ -16,7 +18,11 @@ struct VisualLine {
     end: (f64, f64),
 }
 
-pub fn draw_tree_graph<K, V>(output_path: &str, rbt: &RedBlackTree<K, V>) -> Result<(), KvError>
+pub fn draw_tree<K, V>(
+    output_path: &str,
+    rbt: &RedBlackTree<K, V>,
+    search_target: Option<&K>,
+) -> Result<(), KvError>
 where
     K: Ord + Clone + std::fmt::Display,
     V: Clone + std::fmt::Display,
@@ -49,6 +55,25 @@ where
         &mut max_depth,
     );
 
+    // 🚀 Generate the trace path strings if a search_target exists
+    let path_strings: Vec<String> = if let Some(target) = search_target {
+        rbt.trace_search_path(target)
+            .iter()
+            .map(|key| format!("{}", key))
+            .collect()
+    } else {
+        Vec::new()
+    };
+
+    // 2. Map coordinates of highlighted nodes into a HashSet for O(1) coordinate matching
+    // We convert the float coordinates to bits to safely store them in a HashSet
+    let mut highlighted_coords = HashSet::new();
+    for node in &visual_nodes {
+        if path_strings.contains(&node.label) {
+            highlighted_coords.insert((node.x.to_bits(), node.y.to_bits()));
+        }
+    }
+
     // 3. Setup the chart canvas window (Y-axis runs top-to-bottom for cascading trees)
     let mut chart = ChartBuilder::on(&root)
         .caption(
@@ -69,19 +94,38 @@ where
         .map_err(|e| KvError::Plot(format!("Failed to configure grid lines: {:?}", e)))?;
 
     // 4. 🚀 Draw the branch connection lines first (so they sit behind the circles)
-    chart
-        .draw_series(visual_lines.iter().map(|line| {
-            PathElement::new(vec![line.start, line.end], BLACK.mix(0.6).stroke_width(2))
-        }))
-        .map_err(|e| KvError::Plot(format!("Failed to draw branch paths: {:?}", e)))?;
+    for line in &visual_lines {
+        // A line is highlighted if its start AND end points match a highlighted node's coordinates
+        let start_key = (line.start.0.to_bits(), line.start.1.to_bits());
+        let end_key = (line.end.0.to_bits(), line.end.1.to_bits());
+
+        let is_path_line =
+            highlighted_coords.contains(&start_key) && highlighted_coords.contains(&end_key);
+
+        let line_colour = if is_path_line { &GREEN_200 } else { &BLACK };
+        // let line_width = if is_path_line { 3 } else { 1 };
+
+        chart
+            .draw_series(visual_lines.iter().map(|line| {
+                PathElement::new(
+                    vec![line.start, line.end],
+                    line_colour.mix(0.6).stroke_width(1),
+                )
+            }))
+            .map_err(|e| KvError::Plot(format!("Failed to draw branch paths: {:?}", e)))?;
+    }
 
     // 5. Draw the node circles and white text labels
     for node in &visual_nodes {
-        let circle_colour = if node.colour == Colour::Red {
+        let is_on_path = path_strings.contains(&node.label);
+        let circle_colour = if is_on_path {
+            &CYAN
+        } else if node.colour == Colour::Red {
             &RED
         } else {
             &BLACK
         };
+
         chart
             .draw_series(std::iter::once(Circle::new(
                 (node.x, node.y),
@@ -90,13 +134,16 @@ where
             )))
             .map_err(|e| KvError::Plot(format!("Failed to draw node circle: {:?}", e)))?;
 
+        // Invert the text color for contrast if it's highlighted
+        let text_colour = if is_on_path { &BLACK } else { &WHITE };
+
         // Center the text layout regardless of digit count
         use plotters::style::text_anchor::{HPos, Pos, VPos};
         let anchor_pos = Pos::new(HPos::Center, VPos::Center);
 
         let text_style = ("sans-serif", 15)
             .into_font()
-            .color(&WHITE)
+            .color(text_colour)
             // Use TextAlignment to handle layout dynamically
             .pos(anchor_pos);
 

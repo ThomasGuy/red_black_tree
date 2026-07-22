@@ -1,3 +1,5 @@
-# Binary search tree
+# Red Black tree
 
-A rust interpretation of a binary search tree Symbol table
+A rust interpretation of a red black balanced tree for key value pairs
+
+cargo run data/bst40.txt geo
