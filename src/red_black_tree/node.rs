@@ -1,4 +1,4 @@
-use crate::red_black_tree::tree::Tree;
+use super::Tree;
 use std::fmt::Display;
 
 pub type Link<K, V> = Option<Box<Node<K, V>>>;

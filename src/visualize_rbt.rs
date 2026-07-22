@@ -76,10 +76,7 @@ where
 
     // 3. Setup the chart canvas window (Y-axis runs top-to-bottom for cascading trees)
     let mut chart = ChartBuilder::on(&root)
-        .caption(
-            "Binary Search Tree Structural Visualization",
-            ("sans-serif", 30).into_font(),
-        )
+        .caption("Red Black balanced Tree", ("sans-serif", 30).into_font())
         .margin(40)
         // Reverse Y-axis (max_depth + 0.5 down to -0.5) so root is at the absolute top
         .build_cartesian_2d(-0.5..(total_nodes as f64 - 0.5), (max_depth + 0.5)..-0.5)
