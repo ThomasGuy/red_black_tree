@@ -1,13 +1,17 @@
 use anyhow;
-use bodium_core::{data_types::Point, utils::Seeder};
+use bodium_core::{
+    RedBlackTree,
+    data_types::Point,
+    utils::{Seeder, visualize_rbt},
+};
 use std::{env, process};
 
 pub mod config;
-pub mod red_black_tree;
-pub mod visualize_rbt;
+// pub mod red_black_tree;
+// pub mod visualize_rbt;
 
 use crate::config::{Config, DataFormat};
-use crate::red_black_tree::rbt::RedBlackTree;
+// use crate::red_black_tree::rbt::RedBlackTree;
 
 fn main() {
     let config = Config::build(env::args()).unwrap_or_else(|err| {
@@ -22,6 +26,9 @@ fn main() {
 }
 
 pub fn run_pipeline(config: Config) -> anyhow::Result<()> {
+    let output_file = "tree_view.png";
+    let output_path = env::current_dir()?.join(output_file);
+
     match config.format {
         // --- BRANCH A: TEXT FORMAT PROCESSING TRACK ---
         DataFormat::TextPairs => {
@@ -48,7 +55,7 @@ pub fn run_pipeline(config: Config) -> anyhow::Result<()> {
                 println!("ID: {:<5} -> Coordinates: {}", key, value);
             }
 
-            visualize_rbt::draw_tree("tree_view.png", &rbt, None)?;
+            visualize_rbt::draw_tree(output_file, &rbt, None)?;
         }
 
         // --- BRANCH B: GEOMETRIC FORMAT PROCESSING TRACK ---
@@ -74,10 +81,11 @@ pub fn run_pipeline(config: Config) -> anyhow::Result<()> {
                 rbt.size()
             );
 
-            visualize_rbt::draw_tree("tree_view.png", &rbt, None)?;
+            visualize_rbt::draw_tree(output_file, &rbt, None)?;
         }
     }
 
+    println!("Tree visualization saved to {}", output_path.display());
     Ok(())
 }
 
