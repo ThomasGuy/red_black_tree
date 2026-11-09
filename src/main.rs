@@ -1,5 +1,5 @@
 use anyhow;
-use bodium_core::data_types::{Point, Seeder};
+use bodium_core::{data_types::Point, utils::Seeder};
 use std::{env, process};
 
 pub mod config;
