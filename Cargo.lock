@@ -44,8 +44,9 @@ checksum = "b588b76d00fde79687d7646a9b5bdf3cc0f655e0bbd080335a95d7e96f3587da"
 [[package]]
 name = "bodium_core"
 version = "0.2.0"
-source = "git+ssh://git@github.com/ThomasGuy/lib_bodium.git?branch=main#2acd1e3a3c7ba71fa1efd71d6240177a839add3d"
+source = "git+ssh://git@github.com/ThomasGuy/lib_bodium.git?branch=main#5a3af9e15391e56ee140eaff1d0244ada8bf3b3d"
 dependencies = [
+ "anyhow",
  "compare",
  "plotters",
  "pretty_assertions",

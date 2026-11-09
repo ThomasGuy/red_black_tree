@@ -2,16 +2,9 @@ use anyhow;
 use bodium_core::{
     RedBlackTree,
     data_types::Point,
-    utils::{Seeder, visualize_rbt},
+    utils::{Config, DataFormat, Seeder, visualize_rbt},
 };
 use std::{env, process};
-
-pub mod config;
-// pub mod red_black_tree;
-// pub mod visualize_rbt;
-
-use crate::config::{Config, DataFormat};
-// use crate::red_black_tree::rbt::RedBlackTree;
 
 fn main() {
     let config = Config::build(env::args()).unwrap_or_else(|err| {
